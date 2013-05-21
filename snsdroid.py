@@ -279,35 +279,44 @@ class StatusList(Ui.LinearLayout):
 		for s in sp.home_timeline():
 			self.insert_status(s)
 
-	def __insert_status(self, status):
+	def __insert_status(self, status, index):
 		data = status.parsed
 		try: text = data.title
 		except: text = data.text
 		Ui.TextView(self,
+			pos = 3 * index,
 			text = '%s at %s' % (data.username, utc2str(data.time)),
 			textColor = 'gray',
 		)
 		Ui.TextView(self,
+			pos = 3 * index + 1,
 			text = '   ' + text,
 			clickable = Ui.TRUE,
 			command = lambda s = status: self.clicked(s),
 			layout_width = Ui.FILL_PARENT,
 		)
 		Ui.View(self,
+			pos = 3 * index + 2,
 			background = '@android:drawable/divider_horizontal_dark',
 			layout_width = Ui.FILL_PARENT,
 		)
 
-	def insert_status(self, status):
+	def insert_status(self, status, index = None):
 		if status in self.all:
-			return
+			return False
 
-		self.all.append(status)
-		self.__insert_status(status)
+		if index is None: index = len(self.all)
+		self.all.insert(index, status)
+		self.__insert_status(status, index)
+		return True
 
 	def refresh(self, data = None):
+		i = 0
 		for s in sp.home_timeline(2):
-			self.insert_status(s)
+			if self.insert_status(s, i):
+				i += 1
+		self.show()
+		Ui.info('Refresh: %d new status' % i)
 		return True
 
 	def clicked(self, status):
