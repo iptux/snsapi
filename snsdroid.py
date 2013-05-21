@@ -276,7 +276,7 @@ class StatusList(Ui.LinearLayout):
 			master,
 			layout_width = Ui.FILL_PARENT,
 		)
-		for s in sp.home_timeline():
+		for s in sp.home_timeline(10):
 			self.insert_status(s)
 
 	def __insert_status(self, status, index):
@@ -319,10 +319,21 @@ class StatusList(Ui.LinearLayout):
 		Ui.info('Refresh: %d new status' % i)
 		return True
 
+	def more(self, data = None):
+		n = len(self.all) / len(sp) + 2
+		i = 0
+		for s in sp.home_timeline(n):
+			if self.insert_status(s):
+				i += 1
+		self.show()
+		Ui.info('More: %d status\nscroll to bottom to see' % i)
+		return True
+
 	def clicked(self, status):
 		menu = {
 			'Forward': lambda s = status: self.droid.forward_status(s),
 			'Reply': lambda s = status: self.droid.reply_status(s),
+			'Show More': self.more,
 		}
 		if status.parsed.has_key('link'):
 			menu['Link'] = lambda url = status.parsed.link: Ui.Intent(Ui.ACTION_VIEW, url, categories = Ui.CATEGORY_BROWSABLE).start()
