@@ -382,7 +382,7 @@ class SNSDroid(Ui.DroidUi):
 		channel = NewChannel(self.PLATFORMS[platform]).main()
 		if not channel: return
 		sp.add_channel(channel)
-		sp.auth(channel)
+		sp.auth(channel['channel_name'])
 		return True
 
 	def get_post_text(self, title, init_text = ''):
