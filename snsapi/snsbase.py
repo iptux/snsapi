@@ -27,6 +27,14 @@ from snslog import SNSLog as logger
 from third import oauth
 oauth.logger = logger
 
+# === android platform support  ===
+_isandroid = False
+try:
+    import DroidUi as Ui
+    _isandroid = True
+except ImportError:
+    pass
+
 def require_authed(func):
     '''
     A decorator to require auth before an operation
@@ -253,6 +261,8 @@ class SNSBase(object):
             self.token = None
 
     def open_brower(self, url):
+        if _isandroid:
+            return Ui.Intent(Ui.ACTION_VIEW, url, categories = Ui.CATEGORY_BROWSABLE).start()
         return webbrowser.open(url)
     
     def _parse_code(self, url):
