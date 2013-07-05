@@ -17,6 +17,8 @@ from snsapi.utils import utc2str
 EMAIL = 'Email'
 RSS = 'RSS'
 RSS_RW = 'RSS2RW'
+RSS_SUMMARY = 'RSSSummary'
+RENREN_BLOG = 'RenrenBlog'
 RENREN_SHARE = 'RenrenShare'
 RENREN_STATUS = 'RenrenStatus'
 SQLITE = 'SQLite'
@@ -141,7 +143,7 @@ class NewChannel(CommonView):
 		)
 		self.textField(table, 'Channel Name:', 'channel_name')
 
-		if self.platform in (RENREN_SHARE, RENREN_STATUS, SINA_WEIBO, TENCENT_WEIBO, TWITTER):
+		if self.platform in (RENREN_BLOG, RENREN_SHARE, RENREN_STATUS, SINA_WEIBO, TENCENT_WEIBO, TWITTER):
 			self.textField(table, 'App Key:', 'app_key')
 			self.textField(table, 'App Secret:', 'app_secret')
 
@@ -163,10 +165,10 @@ class NewChannel(CommonView):
 			self.textField(table, 'Access Key:', 'access_key')
 			self.textField(table, 'Access Secret:', 'access_secret')
 
-		if self.platform in (RSS, RSS_RW, SQLITE):
+		if self.platform in (RSS, RSS_RW, RSS_SUMMARY, SQLITE):
 			self.textField(table, 'Url:', 'url')
 
-		if self.platform in (RENREN_SHARE, RENREN_STATUS, SINA_WEIBO, TENCENT_WEIBO):
+		if self.platform in (RENREN_BLOG, RENREN_SHARE, RENREN_STATUS, SINA_WEIBO, TENCENT_WEIBO):
 			self.textField(table, 'Callback Url:', 'callback_url')
 			self.textField(table, 'Cmd Request Url:', 'cmd_request_url', '(default)')
 			self.textField(table, 'Cmd Fetch Code:', 'cmd_fetch_code', '(default)')
@@ -176,7 +178,7 @@ class NewChannel(CommonView):
 		if not self.channel_name.cget('text'):
 			return False
 
-		if self.platform in (RENREN_SHARE, RENREN_STATUS, SINA_WEIBO, TENCENT_WEIBO, TWITTER):
+		if self.platform in (RENREN_BLOG, RENREN_SHARE, RENREN_STATUS, SINA_WEIBO, TENCENT_WEIBO, TWITTER):
 			if not self.app_key.cget('text') or not self.app_secret.cget('text'):
 				return False
 
@@ -192,11 +194,11 @@ class NewChannel(CommonView):
 			if not self.access_key.cget('text') or not self.access_secret.cget('text'):
 				return False
 
-		if self.platform in (RSS, RSS_RW, SQLITE):
+		if self.platform in (RSS, RSS_RW, RSS_SUMMARY, SQLITE):
 			if not self.url.cget('text'):
 				return False
 
-		if self.platform in (RENREN_SHARE, RENREN_STATUS, SINA_WEIBO, TENCENT_WEIBO):
+		if self.platform in (RENREN_BLOG, RENREN_SHARE, RENREN_STATUS, SINA_WEIBO, TENCENT_WEIBO):
 			if not self.callback_url.cget('text') or not self.cmd_request_url.cget('text') or not self.cmd_fetch_code.cget('text') or not self.save_token_file.cget('text'):
 				return False
 
@@ -207,7 +209,7 @@ class NewChannel(CommonView):
 		channel['channel_name'] = self.channel_name.cget('text')
 
 		# app_key and app_secret
-		if self.platform in (RENREN_SHARE, RENREN_STATUS, SINA_WEIBO, TENCENT_WEIBO, TWITTER):
+		if self.platform in (RENREN_BLOG, RENREN_SHARE, RENREN_STATUS, SINA_WEIBO, TENCENT_WEIBO, TWITTER):
 			channel['app_key'] = self.app_key.cget('text')
 			channel['app_secret'] = self.app_secret.cget('text')
 
@@ -237,11 +239,11 @@ class NewChannel(CommonView):
 			channel['access_secret'] = self.access_secret.cget('text')
 
 		# url
-		if self.platform in (RSS, RSS_RW, SQLITE):
+		if self.platform in (RSS, RSS_RW, RSS_SUMMARY, SQLITE):
 			channel['url'] = self.url.cget('text')
 
 		# auth_info
-		if self.platform in (RENREN_SHARE, RENREN_STATUS, SINA_WEIBO, TENCENT_WEIBO):
+		if self.platform in (RENREN_BLOG, RENREN_SHARE, RENREN_STATUS, SINA_WEIBO, TENCENT_WEIBO):
 			channel['auth_info']['callback_url'] = self.callback_url.cget('text')
 			channel['auth_info']['cmd_request_url'] = self.cmd_request_url.cget('text')
 			channel['auth_info']['cmd_fetch_code'] = self.cmd_fetch_code.cget('text')
@@ -347,6 +349,8 @@ class SNSDroid(Ui.DroidUi):
 		'email': EMAIL,
 		'rss': RSS,
 		'rss rw': RSS_RW,
+		'rss summary': RSS_SUMMARY,
+		'renren blog': RENREN_BLOG,
 		'renren share': RENREN_SHARE,
 		'renren status': RENREN_STATUS,
 		'sqlite': SQLITE,
@@ -409,7 +413,7 @@ class SNSDroid(Ui.DroidUi):
 		if not self.channel:
 			Ui.message(APP, 'switch to a channel first')
 			return
-		if sp[self.channel].platform == RSS:
+		if sp[self.channel].platform in (RSS, RSS_SUMMARY):
 			Ui.message(APP, 'cannot post to RSS channel')
 			return
 
